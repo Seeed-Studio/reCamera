@@ -1,27 +1,32 @@
 #!/bin/bash
 
+function rsync_dir()
+{
+    echo "rsync $1 -> $PROJECT_OUT/$2"; rsync -a --exclude='.git' $1 $PROJECT_OUT/$2 || exit 1
+}
+
 ###################################
 # rsync codes
 ###################################
 mkdir -p $PROJECT_OUT
-echo "rsync ./build"; rsync -a --exclude='.git' ./build $PROJECT_OUT/
-echo "rsync ./freertos"; rsync -a --exclude='.git' ./freertos $PROJECT_OUT/
-echo "rsync ./fsbl"; rsync -a --exclude='.git' ./fsbl $PROJECT_OUT/
-echo "rsync ./isp_tuning"; rsync -a --exclude='.git' ./isp_tuning $PROJECT_OUT/
-echo "rsync ./linux_5.10"; rsync -a --exclude='.git' ./linux_5.10 $PROJECT_OUT/
-echo "rsync ./middleware"; rsync -a --exclude='.git' ./middleware $PROJECT_OUT/
-echo "rsync ./opensbi"; rsync -a --exclude='.git' ./opensbi $PROJECT_OUT/
-echo "rsync ./osdrv"; rsync -a --exclude='.git' ./osdrv $PROJECT_OUT/
-echo "rsync ./ramdisk"; rsync -a --exclude='.git' ./ramdisk $PROJECT_OUT/
-echo "rsync ./u-boot-2021.10"; rsync -a --exclude='.git' ./u-boot-2021.10 $PROJECT_OUT/
-echo "rsync ./buildroot-2021.05"; rsync -a --exclude='.git' ./buildroot-2021.05 $PROJECT_OUT/
-echo "rsync ./SensorSupportList"; rsync -a --exclude='.git' ./SensorSupportList/ $PROJECT_OUT/middleware/v2/component/isp/
+rsync_dir ./build
+rsync_dir ./freertos
+rsync_dir ./fsbl
+rsync_dir ./isp_tuning
+rsync_dir ./linux_5.10
+rsync_dir ./middleware
+rsync_dir ./opensbi
+rsync_dir ./osdrv
+rsync_dir ./ramdisk
+rsync_dir ./u-boot-2021.10
+rsync_dir ./buildroot-2021.05
+rsync_dir ./SensorSupportList/ middleware/v2/component/isp/
 
 ###################################
 # patch externals
 ###################################
-echo "rsync $EXTERNAL/build"; rsync -av $EXTERNAL/build $PROJECT_OUT/
-echo "rsync $EXTERNAL/fsbl"; rsync -av $EXTERNAL/fsbl $PROJECT_OUT/
+echo "rsync $EXTERNAL/build"; rsync -av $EXTERNAL/build $PROJECT_OUT/ || return $?
+echo "rsync $EXTERNAL/fsbl"; rsync -av $EXTERNAL/fsbl $PROJECT_OUT/ || return $?
 
 patches=`find $EXTERNAL/patches/ -name "*.patch" | sort`
 for patch in ${patches}; do
