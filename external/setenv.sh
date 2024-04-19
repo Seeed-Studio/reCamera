@@ -2,6 +2,7 @@
 
 function rsync_dir()
 {
+    mkdir -p $PROJECT_OUT/$2
     echo "rsync $1 -> $PROJECT_OUT/$2"; rsync -a --exclude='.git' $1 $PROJECT_OUT/$2 || exit 1
 }
 
@@ -25,8 +26,9 @@ rsync_dir ./SensorSupportList/ middleware/v2/component/isp/
 ###################################
 # patch externals
 ###################################
-echo "rsync $EXTERNAL/build"; rsync -av $EXTERNAL/build $PROJECT_OUT/ || return $?
-echo "rsync $EXTERNAL/fsbl"; rsync -av $EXTERNAL/fsbl $PROJECT_OUT/ || return $?
+rsync_dir $EXTERNAL/build .
+rsync_dir $EXTERNAL/fsbl .
+rsync_dir $EXTERNAL/rootfs_overlay/ buildroot-2021.05/board/cvitek/CV181X/overlay/
 
 patches=`find $EXTERNAL/patches/ -name "*.patch" | sort`
 for patch in ${patches}; do
